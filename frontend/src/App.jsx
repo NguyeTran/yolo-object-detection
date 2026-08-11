@@ -113,10 +113,10 @@ function App() {
             {result && result.detections.length > 0 && (
               <div sytle={{
                 position: 'absolute',
-                top = '10%', left = '10%',
-                width = '100px', height = '150px',
-                border = '3px solid red',
-                boxSizing = 'border-box',
+                top : '10%', left : '10%',
+                width : '100px', height : '150px',
+                border : '3px solid red',
+                boxSizing : 'border-box',
               }}>
                   <span sytle={{ backgroundColor: 'red', color: 'white', padding: '2px 5px', fontSize: '12px', position: 'absolute', top: '-20px', left: '-3px' }}>
                   
