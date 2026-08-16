@@ -100,7 +100,7 @@ function App() {
         <div style={{ display : 'flex', gap : '20px', alignItems : 'flex-start', marginBottom: '20px' }}>
 
           {/*Left side: Display the uploaded picture */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative' , display: 'inline-block'}}>
             <img
               ref={imageRef}
               src={previewUrl}
@@ -110,19 +110,52 @@ function App() {
 
             {/*Draw bounding boxes if result is available */}
 
-            {result && result.detections.length > 0 && (
-              <div sytle={{
-                position: 'absolute',
-                top : '10%', left : '10%',
-                width : '100px', height : '150px',
-                border : '3px solid red',
-                boxSizing : 'border-box',
-              }}>
-                  <span sytle={{ backgroundColor: 'red', color: 'white', padding: '2px 5px', fontSize: '12px', position: 'absolute', top: '-20px', left: '-3px' }}>
-                  
+            {result && result.detections.map((item, index) => {
+              const { x_min, y_min, x_max, y_max } = item.bounding_box;
+              const image = imageRef.current;
+
+              if (!image) return null;
+
+              const scaleX = image.clientWidth / image.naturalWidth;
+              const scaleY = image.clientHeight / image.naturalHeight;
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    position: 'absolute',
+
+                    left: `${x_min * scaleX}px`,
+                    top: `${y_min * scaleY}px`,
+
+                    width: `${(x_max - x_min) * scaleX}px`,
+                    height: `${(y_max - y_min) * scaleY}px`,
+
+                    border: '2px solid red',
+                    boxSizing: 'border-box',
+
+                    pointerEvents: 'none', // Prevent the bounding box from blocking interactions with the image
+                  }}>
+                  <span 
+                    style={{
+                      position: 'absolute',
+
+                      top: '-20px',
+                      left: '0',
+
+                      backgroundColor: 'red',
+                      color: 'white',
+                      
+                      padding: '2px 5px',
+                      fontSize: '12px',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {item.detected_class} ({Math.round(item.confidence_score * 100)}%)
                   </span>
-               </div>
-             )}
+                </div>
+              );
+            })}
           </div>
 
           {/*Right side: Display the result from FastAPI */}

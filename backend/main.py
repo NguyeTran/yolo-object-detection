@@ -1,5 +1,6 @@
 import io
 from PIL import Image
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from ultralytics import YOLO
@@ -16,6 +17,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="YOLO Detection API", lifespan=lifespan)
 
+# Cho phép React frontend gọi FastAPI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 def health_check():
     return {"status": "ok", "message": "FastAPI server is running!"}
@@ -25,7 +38,7 @@ def health_check():
 async def detect_image(file: UploadFile = File(...)):
     if file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
         raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file JPG, JPEG hoặc PNG")
-    
+
     start_time = time.time()
     
     # 1. Đọc file ảnh dưới dạng byte
