@@ -21,5 +21,5 @@ If you are developing a production application, we recommend using TypeScript wi
 2. Run npm run dev
 3. Ctrl + Click to the destination at Local
 
-**Make sure that your Node.js is v22.x.x
-**To check what version in your Node.js, run node -v
+**Make sure that your Node.js is v22.x.x.
+**To check what version in your Node.js, run node -v.
