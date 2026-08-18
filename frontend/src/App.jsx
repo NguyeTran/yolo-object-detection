@@ -109,6 +109,7 @@ function App() {
             />
 
             {/*Draw bounding boxes if result is available */}
+                        {/* WARN: no need this block */}
 
             {result && result.detections.map((item, index) => {
               const { x_min, y_min, x_max, y_max } = item.bounding_box;
