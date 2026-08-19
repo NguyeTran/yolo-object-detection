@@ -3,7 +3,6 @@ name: Build and Publish
 on:
   push:
     branches: [ "main" ]
-    tags: [ 'v*.*.*' ] # Hỗ trợ tự động build theo tag (ví dụ: v1.0.0)
 
 env:
   REGISTRY: ghcr.io
@@ -14,21 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write # Cấp quyền cho GitHub Token đẩy image lên GHCR
+      packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Log in to the Container registry
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} # Tự động cấp quyền, KHÔNG lộ credential
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # --- BACKEND ---
-      - name: Extract metadata for Backend
+      # --- ĐÓNG GÓI BACKEND ---
+      - name: Extract metadata Backend
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
@@ -40,12 +38,9 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ steps.meta-backend.outputs.tags }}
-          labels: ${{ steps.meta-backend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
-      # --- FRONTEND ---
-      - name: Extract metadata for Frontend
+      # --- ĐÓNG GÓI FRONTEND ---
+      - name: Extract metadata Frontend
         id: meta-frontend
         uses: docker/metadata-action@v5
         with:
@@ -57,6 +52,3 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{ steps.meta-frontend.outputs.tags }}
-          labels: ${{ steps.meta-frontend.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max

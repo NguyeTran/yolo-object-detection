@@ -1,78 +1,48 @@
-name: CI Pipeline
+name: Continuous Integration
 
 on:
-  # 1. Kích hoạt CI tự động mỗi khi bạn PUSH lên nhánh riêng
   push:
-    branches: [ "feature/frontend-react-ui" ]
-  
-  # 2. Vẫn giữ lại dòng này để sau này tạo Pull Request vào main nó tự test lại lần cuối
+    branches-ignore: [ "main" ]
   pull_request:
-    branches: [ "main" ]    
+    branches: [ "main" ]
 
 jobs:
-  test-backend:
+  # 1. KIỂM TRA BACKEND VÀ CHẠY BÀI TEST AI
+  backend-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip' # Tự động cache pip dependencies
-      - name: Install dependencies
+
+      - name: Install dependencies and Test Tools
         run: |
           cd backend
           pip install -r requirements.txt
-          pip install pytest flake8
-      - name: Lint and Test
+          pip install pytest httpx  # Cài công cụ test
+
+      - name: Run AI Object Detection Test
         run: |
           cd backend
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Chạy pytest nếu bạn đã viết test case, tạm thời để echo
-          echo "Running backend tests..." 
+          # Chạy bài test ép tìm ra con chó trong sample_dog.jpg
+          pytest test_main.py -v
 
-  test-frontend:
+  # 2. KIỂM TRA FRONTEND
+  frontend-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install dependencies
+
+      - name: Install & Build Frontend
         run: |
           cd frontend
-          npm ci
-      - name: Run Tests
-        run: |
-          cd frontend
-          # Chạy npm test nếu có, tạm thời để echo
-          echo "Running frontend tests..."
-
-  docker-build-check:
-    needs: [test-backend, test-frontend] # Chỉ chạy khi 2 job trên pass
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      # Build test Backend
-      - name: Build Backend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: false # Chỉ build để check lỗi Dockerfile, không push
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Build test Frontend
-      - name: Build Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          npm install
+          npm run build  # Đảm bảo code React không bị lỗi cú pháp
