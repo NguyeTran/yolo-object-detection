@@ -5,9 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from ultralytics import YOLO
 import time
+from prometheus_fastapi_instrumentator import Instrumentator
 
-ml_models = {}
-
+# 1. Khởi tạo lifespan trước
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Đang khởi tạo mô hình YOLOv8n...")
@@ -15,15 +15,17 @@ async def lifespan(app: FastAPI):
     yield
     ml_models.clear()
 
+# 2. Khởi tạo app DUY NHẤT (bao gồm lifespan và title)
 app = FastAPI(title="YOLO Detection API", lifespan=lifespan)
+ml_models = {}
 
-# Cho phép React frontend gọi FastAPI
+# 3. Gắn "ống nghe" vào đúng đối tượng app này
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+
+# 4. Middleware CORS (Thêm link Render của bạn vào danh sách allow_origins sau này)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=["*"], # Tạm thời để * để test, sau này nên thay bằng domain chính thức
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,7 +35,6 @@ app.add_middleware(
 def health_check():
     return {"status": "ok", "message": "FastAPI server is running!"}
 
-# --- CẬP NHẬT API NÀY ---
 @app.post("/api/detect/image")
 async def detect_image(file: UploadFile = File(...)):
     if file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
