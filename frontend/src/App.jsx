@@ -15,6 +15,7 @@ function App() {
 
   //Result from FastAPI
   const [result, setResult] = useState(null);
+  const [annotatedImage, setAnnotatedImage] = useState(null);
 
   //Display the picture to drawing the bounding box
   const imageRef = useRef(null);
@@ -33,6 +34,7 @@ function App() {
 
       // Reset the result state when a new file is selected
       setResult(null);
+      setAnnotatedImage(null);
     }
   };
 
@@ -66,7 +68,10 @@ function App() {
       
       //Parse the JSON response from FastAPI
       const data = await response.json();
+
       setResult(data);
+      if (data.annotated_image) setAnnotatedImage(`data:image/jpeg;base64,${data.annotated_image}`);
+
     }
     catch (error) {
       console.error('Error uploading file:', error);
@@ -103,60 +108,10 @@ function App() {
           <div style={{ position: 'relative' , display: 'inline-block'}}>
             <img
               ref={imageRef}
-              src={previewUrl}
+              src={annotatedImage || previewUrl}
               alt="Preview"
               style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
             />
-
-            {/*Draw bounding boxes if result is available */}
-                        {/* WARN: no need this block */}
-
-            {result && result.detections.map((item, index) => {
-              const { x_min, y_min, x_max, y_max } = item.bounding_box;
-              const image = imageRef.current;
-
-              if (!image) return null;
-
-              const scaleX = image.clientWidth / image.naturalWidth;
-              const scaleY = image.clientHeight / image.naturalHeight;
-
-              return (
-                <div
-                  key={index}
-                  style={{
-                    position: 'absolute',
-
-                    left: `${x_min * scaleX}px`,
-                    top: `${y_min * scaleY}px`,
-
-                    width: `${(x_max - x_min) * scaleX}px`,
-                    height: `${(y_max - y_min) * scaleY}px`,
-
-                    border: '2px solid red',
-                    boxSizing: 'border-box',
-
-                    pointerEvents: 'none', // Prevent the bounding box from blocking interactions with the image
-                  }}>
-                  <span 
-                    style={{
-                      position: 'absolute',
-
-                      top: '-20px',
-                      left: '0',
-
-                      backgroundColor: 'red',
-                      color: 'white',
-                      
-                      padding: '2px 5px',
-                      fontSize: '12px',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {item.detected_class} ({Math.round(item.confidence_score * 100)}%)
-                  </span>
-                </div>
-              );
-            })}
           </div>
 
           {/*Right side: Display the result from FastAPI */}
