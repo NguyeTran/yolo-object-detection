@@ -1,12 +1,13 @@
 import io
 import base64
 import time
+import numpy as np
+import cv2
 from PIL import Image
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from ultralytics import YOLO
-from fastapi.responses import Response
 from prometheus_fastapi_instrumentator import Instrumentator
 
 # 1. Khởi tạo lifespan trước
@@ -83,15 +84,59 @@ async def detect_image(file: UploadFile = File(...)):
         })
 
     # ==============================
-    # YOLO tự vẽ bounding box
+    # Vẽ bounding box màu đỏ
     # ==============================
 
-    annotated_image = result.plot()
+    # PIL -> NumPy
+    annotated_image = np.array(image)
 
-    # YOLO trả về BGR -> chuyển sang RGB
-    annotated_image = Image.fromarray(
-        annotated_image[..., ::-1]
+    # RGB -> BGR để OpenCV xử lý
+    annotated_image = cv2.cvtColor(
+    annotated_image,
+    cv2.COLOR_RGB2BGR
     )
+
+    for box in result.boxes:
+
+        coords = box.xyxy[0].tolist()
+
+        x1, y1, x2, y2 = map(int, coords)
+
+        class_id = int(box.cls[0].item())
+        class_name = result.names[class_id]
+
+        confidence = box.conf[0].item()
+
+        # Vẽ bounding box màu đỏ
+        cv2.rectangle(
+            annotated_image,
+            (x1, y1),
+            (x2, y2),
+            (0, 0, 255),
+            3
+        )
+
+        # Tên class + confidence
+        label = f"{class_name} {confidence:.2f}"
+
+        cv2.putText(
+            annotated_image,
+            label,
+            (x1, max(y1 - 10, 20)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (0, 0, 255),
+            2
+        )
+
+    # BGR -> RGB
+    annotated_image = cv2.cvtColor(
+        annotated_image,
+        cv2.COLOR_BGR2RGB
+    )
+
+    # NumPy -> PIL
+    annotated_image = Image.fromarray(annotated_image)
 
     # ==============================
     # Chuyển ảnh thành Base64
