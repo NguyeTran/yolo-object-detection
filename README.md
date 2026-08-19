@@ -42,3 +42,6 @@ Dưới đây là các đường dẫn (endpoints) chính của hệ thống khi
 1. Thêm thư viện đo lường vào file `requirements.txt`:
    ```text
    prometheus-fastapi-instrumentator
+
+### To run the docker
+1. Run docker compose up --build
