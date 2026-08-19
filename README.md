@@ -13,27 +13,27 @@ Hệ thống hoạt động theo mô hình RESTful API:
 ---
 
 ## 🛠️ 2. Hướng dẫn vận hành & Endpoints
-Dưới đây là các đường dẫn (endpoints) chính của hệ thống khi chạy trên Production[cite: 1]:
+Dưới đây là các đường dẫn (endpoints) chính của hệ thống khi chạy trên Production:
 
 | Chức năng | Phương thức | Đường dẫn (URL) | Mô tả chi tiết |
 | :--- | :---: | :--- | :--- |
-| **API Docs** | `GET` | `/docs` | Giao diện Swagger UI tự động giúp kiểm tra và test API trực tiếp trên trình duyệt[cite: 1]. |
-| **Health Check** | `GET` | `/health` | Kiểm tra trạng thái hoạt động của server (trả về JSON xác nhận sống)[cite: 1]. |
-| **Object Detection** | `POST` | `/api/detect/image` | Nhận file ảnh tải lên (`multipart/form-data`) và trả về kết quả tọa độ, tên vật thể nhận diện[cite: 1]. |
-| **System Metrics** | `GET` | `/metrics` | Cung cấp dữ liệu thô theo chuẩn Prometheus dùng để kết nối với Grafana[cite: 1]. |
+| **API Docs** | `GET` | `/docs` | Giao diện Swagger UI tự động giúp kiểm tra và test API trực tiếp trên trình duyệt. |
+| **Health Check** | `GET` | `/health` | Kiểm tra trạng thái hoạt động của server (trả về JSON xác nhận sống). |
+| **Object Detection** | `POST` | `/api/detect/image` | Nhận file ảnh tải lên (`multipart/form-data`) và trả về kết quả tọa độ, tên vật thể nhận diện. |
+| **System Metrics** | `GET` | `/metrics` | Cung cấp dữ liệu thô theo chuẩn Prometheus dùng để kết nối với Grafana. |
 
 ---
 
 ## ⚠️ 3. Các lỗi thường gặp & Cách xử lý thực chiến
 
 * **Lỗi 503 Service Unavailable (`hibernate-wake-error`):**
-  * *Nguyên nhân:* Do sử dụng gói Free trên Render, server sẽ tự động "ngủ đông" (hibernate) sau một khoảng thời gian không có request[cite: 1].
-  * *Cách khắc phục:* Kiên nhẫn chờ từ 30 đến 50 giây để server khởi động lại ở lần gọi đầu tiên. Khuyên dùng dịch vụ **UptimeRobot** để ping tự động vào `/health` mỗi 5 phút nhằm giữ server luôn "tỉnh táo"[cite: 1].
+  * *Nguyên nhân:* Do sử dụng gói Free trên Render, server sẽ tự động "ngủ đông" (hibernate) sau một khoảng thời gian không có request.
+  * *Cách khắc phục:* Kiên nhẫn chờ từ 30 đến 50 giây để server khởi động lại ở lần gọi đầu tiên. Khuyên dùng dịch vụ **UptimeRobot** để ping tự động vào `/health` mỗi 5 phút nhằm giữ server luôn "tỉnh táo".
 * **Hiện tượng "Loading" xoay vòng khi gọi API (`Execute`):**
-  * *Nguyên nhân:* Ở lần gọi đầu tiên sau khi thức dậy, mô hình AI cần thời gian để tải trọng số (weights) vào bộ nhớ RAM[cite: 1].
-  * *Cách khắc phục:* Nên sử dụng các file ảnh có dung lượng nhỏ, tối ưu kích thước (ví dụ dưới vài trăm KB) để tăng tốc độ phản hồi[cite: 1].
+  * *Nguyên nhân:* Ở lần gọi đầu tiên sau khi thức dậy, mô hình AI cần thời gian để tải trọng số (weights) vào bộ nhớ RAM.
+  * *Cách khắc phục:* Nên sử dụng các file ảnh có dung lượng nhỏ, tối ưu kích thước (ví dụ dưới vài trăm KB) để tăng tốc độ phản hồi.
 * **Lỗi 422 Validation Error:**
-  * *Nguyên nhân:* Dữ liệu gửi lên không khớp với định dạng yêu cầu của API (ví dụ: thiếu file hoặc gửi sai định dạng file ảnh hỗ trợ như JPG/PNG)[cite: 1].
+  * *Nguyên nhân:* Dữ liệu gửi lên không khớp với định dạng yêu cầu của API (ví dụ: thiếu file hoặc gửi sai định dạng file ảnh hỗ trợ như JPG/PNG).
 
 ---
 
