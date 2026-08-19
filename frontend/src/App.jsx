@@ -56,7 +56,7 @@ function App() {
     
     try {
       // Send the file to FastAPI using fetch
-      const response = await fetch('http://127.0.0.1:8000/api/detect/image', {
+      const response = await fetch('/api/detect/image', {
         method: 'POST',
         body: formData,
       });

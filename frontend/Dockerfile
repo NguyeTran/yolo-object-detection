@@ -1,20 +1,31 @@
-# Sử dụng môi trường Node.js siêu nhẹ
-FROM node:20-alpine
+# Stage 1: Build React application
+FROM node:20-alpine AS builder
 
-# Đặt thư mục làm việc trong container
 WORKDIR /app
 
-# Copy các file quản lý thư viện vào trước để tận dụng cache
+# Copy dependency files trước để tận dụng Docker cache
 COPY package*.json ./
 
-# Cài đặt toàn bộ thư viện
-RUN npm install
+# Cài dependencies
+RUN npm ci
 
-# Copy toàn bộ mã nguồn frontend vào container
+# Copy source code
 COPY . .
 
-# Mở cổng 5173 (cổng mặc định của Vite)
-EXPOSE 5173
+# Build production
+RUN npm run build
 
-# Lệnh khởi động Frontend
-CMD ["npm", "run", "dev", "--", "--host"]
+
+# Stage 2: Serve static files
+FROM nginx:alpine
+
+# Copy build result vào nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose HTTP port
+EXPOSE 80
+
+# Chạy nginx
+CMD ["nginx", "-g", "daemon off;"]
