@@ -5,6 +5,7 @@ services:
     env: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
+    region: singapore
     plan: free
     envVars:
       - key: PORT
