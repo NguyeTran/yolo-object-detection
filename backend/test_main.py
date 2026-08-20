@@ -32,3 +32,20 @@ def test_detect_image_success():
         assert "filename" in data
         assert "object_count" in data
         assert "detections" in data
+
+def test_detect_image_find_dog():
+    with TestClient(app) as client:
+        try:
+            with open("sample_dog.jpg", "rb") as image_file:
+                files = {"file": ("sample_dog.jpg", image_file, "image/jpeg")}
+                response = client.post("/api/detect/image", files=files)
+        except FileNotFoundError:
+            assert False, "Không tìm thấy file sample_dog.jpg"
+        
+    
+        assert response.status_code == 200
+        data = response.json()
+        
+        detected_classes = [item["detected_class"] for item in data["detections"]]
+        
+        assert "dog" in detected_classes, f"Test thất bại: Không tìm thấy chó! YOLO chỉ thấy: {detected_classes}"
