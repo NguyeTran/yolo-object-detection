@@ -3,4 +3,5 @@ uvicorn[standard]
 python-multipart
 ultralytics
 pillow
-prometheus-fastapi-instrumentator
+prometheus-fastapi-instrumentatorpytest
+httpx
