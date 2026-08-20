@@ -22,7 +22,6 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          pip install pytest httpx  # Cài công cụ test
 
       - name: Run AI Object Detection Test
         run: |
