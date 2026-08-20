@@ -44,4 +44,5 @@ Dưới đây là các đường dẫn (endpoints) chính của hệ thống khi
    prometheus-fastapi-instrumentator
 
 ### To run the docker
-1. Run docker compose up --build
+1. Run docker compose up --build (for the first time), at next time, run docker compose up.
+2. Open the browser and lookup http://localhost:5173.
