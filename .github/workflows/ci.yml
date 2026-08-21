@@ -43,5 +43,19 @@ jobs:
       - name: Install & Build Frontend
         run: |
           cd frontend
-          npm install
+          npm ci  # Cài đặt các dependencies
           npm run build  # Đảm bảo code React không bị lỗi cú pháp
+  
+  # 3. Docker checks
+  docker-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t yolo-backend:test ./backend
+
+      - name: Build Frontend Docker Image
+        run: |
+          docker build -t yolo-frontend:test ./frontend
