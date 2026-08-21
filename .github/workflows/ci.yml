@@ -46,16 +46,29 @@ jobs:
           npm ci  # Cài đặt các dependencies
           npm run build  # Đảm bảo code React không bị lỗi cú pháp
   
-  # 3. Docker checks
+    # 3. Docker checks
   docker-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build Backend Docker Image
-        run: |
-          docker build -t yolo-backend:test ./backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          tags: yolo-backend:test
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
       - name: Build Frontend Docker Image
-        run: |
-          docker build -t yolo-frontend:test ./frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          tags: yolo-frontend:test
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
