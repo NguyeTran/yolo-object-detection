@@ -1,0 +1,20 @@
+# RUN THE BACKEND
+
+1. Create a virutal environment
+2. Active the virtual environment
+3. Run:
+       - python -m pip install --upgrade pip 
+       - python -m pip install --no-cache-dir -r requirements.txt
+4. Run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+* If have Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit), mean that run successful
+
+# HUONG DAN CHAY TEST TRUOC KHI PUSH
+
+1. Create a virtual environment
+2. Activate the virtual environment 
+3. Run 
+       - cd backend
+       - pip install -r requirements.txt
+       - pytest test_main.py -v
+   
