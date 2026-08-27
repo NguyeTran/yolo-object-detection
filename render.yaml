@@ -20,6 +20,7 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_BASE_URL
+        value: https://yolo-object-detection-bbe2.onrender.com
         fromService:
           type: web
           name: yolo-backend
