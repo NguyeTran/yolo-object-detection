@@ -22,7 +22,7 @@ function App() {
 
   //2. Function to handle file selection
 
-  const API_URL = import.meta.env.VITE_API_URL; // Replace with your FastAPI endpoint
+  const API_URL = import.meta.env.VITE_API_BASE_URL; // Replace with your FastAPI endpoint
   const handleFileChange = (event) => {
     // Get the selected file from the input
     const file = event.target.files[0];
