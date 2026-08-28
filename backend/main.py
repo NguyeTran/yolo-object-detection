@@ -25,7 +25,7 @@ ml_models = {}
 # 3. Gắn "ống nghe" vào đúng đối tượng app này
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
-# 4. Middleware CORS (Thêm link Render của bạn vào danh sách allow_origins sau này)
+# 4. Middleware CORS (Thêm link Render vào danh sách allow_origins sau này)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Tạm thời để * để test, sau này nên thay bằng domain chính thức
