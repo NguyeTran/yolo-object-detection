@@ -2,7 +2,7 @@ services:
   # Backend
   - type: web
     name: yolo-backend
-    env: docker
+    runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     region: singapore
@@ -17,13 +17,12 @@ services:
   # Frontend
   - type: web
     name: yolo-frontend
-    env: static
-    buildCommand: cd frontend && npm install && VITE_API_BASE_URL=https://yolo-object-detection-bbe2.onrender.com npm run build
-    staticPublishPath: ./frontend/dist
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    region: singapore
+    plan: free
 
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: yolo-backend
-          envVarKey: RENDER_EXTERNAL_URL
+        sync : false
