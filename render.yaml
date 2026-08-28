@@ -1,5 +1,5 @@
 services:
-  # Backend service
+  # Backend
   - type: web
     name: yolo-backend
     env: docker
@@ -7,14 +7,23 @@ services:
     dockerContext: ./backend
     region: singapore
     plan: free
+    
     envVars:
       - key: PORT
         value: 8000
+
     healthCheckPath: /health
 
-  # Frontend service
+  # Frontend
   - type: web
     name: yolo-frontend
     env: static
-    buildCommand: cd frontend && npm install && echo "API=$VITE_API_BASE_URL" && npm run build
+    buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
+
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: yolo-backend
+          envVarKey: RENDER_EXTERNAL_URL
