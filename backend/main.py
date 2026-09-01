@@ -1,9 +1,15 @@
+import os
+
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+
 import io
 import base64
 import time
 import threading
 import subprocess
-import os
 import uuid
 import tempfile
 from pathlib import Path
@@ -12,6 +18,7 @@ from contextlib import asynccontextmanager
 
 import numpy as np
 import cv2
+import torch
 from PIL import Image
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,13 +26,17 @@ from fastapi.responses import FileResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from ultralytics import YOLO
 
+torch.set_num_threads(1)
+torch.set_num_interop_threads(1)
+cv2.setNumThreads(1)
+
 # ==============================
 # Config (override via env vars on Render)
 # ==============================
 MAX_VIDEO_SIZE = int(os.getenv("MAX_VIDEO_SIZE_MB", 20)) * 1024 * 1024   # default 20 MB
 MAX_VIDEO_DURATION = int(os.getenv("MAX_VIDEO_DURATION", 15))            # default 15s
 FRAME_SKIP = int(os.getenv("FRAME_SKIP", 4))                             # infer every Nth frame
-INFER_IMGSZ = int(os.getenv("INFER_IMGSZ", 480))                         # smaller = faster on CPU
+INFER_IMGSZ = int(os.getenv("INFER_IMGSZ", 320))                         # smaller = faster on CPU
 
 # ==============================
 # Model (loaded once at startup, protected by a lock)
