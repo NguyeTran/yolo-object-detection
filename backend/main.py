@@ -42,6 +42,18 @@ def load_model():
         print("YOLOv8n đã sẵn sàng.")
     return model
 
+def warmup_model():
+    """
+    Chạy 1 lần inference "giả" trên ảnh đen lúc startup.
+    Lần inference đầu tiên của PyTorch/YOLO luôn chậm hơn hẳn các lần sau
+    (phải khởi tạo kernel/graph nội bộ). Làm việc này lúc startup thay vì
+    để user đầu tiên phải gánh chi phí đó.
+    """
+    m = load_model()
+    dummy = np.zeros((INFER_IMGSZ, INFER_IMGSZ, 3), dtype=np.uint8)
+    m(dummy, imgsz=INFER_IMGSZ, verbose=False)
+    print("Model đã warm-up xong.")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -86,12 +98,12 @@ def health_check():
 
 
 @app.post("/api/detect/image")
-async def detect_image(file: UploadFile = File(...)):
+def detect_image(file: UploadFile = File(...)):
     if file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
         raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file JPG, JPEG hoặc PNG")
 
     start_time = time.time()
-    image_bytes = await file.read()
+    image_bytes = file.file.read()
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
     with model_lock:
@@ -151,7 +163,7 @@ async def detect_image(file: UploadFile = File(...)):
 
 
 @app.post("/api/detect/video")
-async def detect_video(file: UploadFile = File(...)):
+def detect_video(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Không có file video.")
 
@@ -173,7 +185,7 @@ async def detect_video(file: UploadFile = File(...)):
             temp_path = temp_file.name
             total_size = 0
             while True:
-                chunk = await file.read(1024 * 1024)
+                chunk = file.file.read(1024 * 1024)
                 if not chunk:
                     break
                 total_size += len(chunk)
