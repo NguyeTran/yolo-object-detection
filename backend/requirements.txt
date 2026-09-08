@@ -6,3 +6,4 @@ pillow
 prometheus-fastapi-instrumentator
 pytest
 httpx
+opencv-python-headless

@@ -43,6 +43,8 @@ Dưới đây là các đường dẫn (endpoints) chính của hệ thống khi
    ```text
    prometheus-fastapi-instrumentator
 
-### To run the docker
-1. Run docker compose up --build (for the first time), at next time, run docker compose up.
-2. Open the browser and lookup http://localhost:5173.
+## Run the Render web service
+1. Open https://yolo-object-detection-bbe2.onrender.com in browser (wait few second for Render run the web).
+2. Open https://yolo-frontend-r3yv.onrender.com in browser (wait few second for Render run the web).
+* In the frontend web service, F12 -> Console, check if the API URL: https://yolo-object-detection-bbe2.onrender.com or not.
+* If TRUE, upload and detect normal (The process could take a long time, just wait and do nothing).

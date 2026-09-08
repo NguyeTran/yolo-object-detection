@@ -4,6 +4,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# Using VITE_API_BASE_URL from Render
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+# Build production
 RUN npm run build
 
 # Stage 2: Phục vụ tệp tĩnh bằng Nginx
