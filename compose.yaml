@@ -1,39 +1,26 @@
 services:
-
   backend:
-    build:
+    build: 
       context: ./backend
-
-    container_name: yolo_backend
-
     ports:
       - "8000:8000"
-
     environment:
-      MODEL_NAME: yolov8n.pt
-      CONFIDENCE_THRESHOLD: 0.5
-      MAX_UPLOAD_SIZE: 10485760
-
-    restart: unless-stopped
-
+      - MODEL_NAME=${MODEL_NAME:-yolov8n.pt}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
-
-    container_name: yolo_frontend
-
     ports:
-      - "5173:80"
-
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://backend:8000}
     depends_on:
       backend:
         condition: service_healthy
-
     restart: unless-stopped
